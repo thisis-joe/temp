@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.home.favorite.FavoriteMapper">
+    <insert id="insert" parameterType="com.ssafy.home.favorite.Favorite" useGeneratedKeys="true" keyProperty="id">
+        insert into favorites (member_id, sido_nm, sigungu_nm, dong_nm, lawd_cd, memo)
+        values (#{memberId}, #{sidoNm}, #{sigunguNm}, #{dongNm}, #{lawdCd}, #{memo})
+    </insert>
+
+    <select id="findByMemberId" resultType="com.ssafy.home.favorite.Favorite">
+        select * from favorites where member_id = #{memberId} order by id desc
+    </select>
+
+    <delete id="delete">
+        delete from favorites where id = #{id} and member_id = #{memberId}
+    </delete>
+</mapper>

@@ -1,0 +1,7 @@
+package com.ssafy.home.region;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "app.sgis")
+public record SgisProperties(String consumerKey, String consumerSecret) {
+}

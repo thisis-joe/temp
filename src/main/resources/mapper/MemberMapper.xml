@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.home.member.MemberMapper">
+    <insert id="insert" parameterType="com.ssafy.home.member.Member" useGeneratedKeys="true" keyProperty="id">
+        insert into members (email, password, name, phone, address, role)
+        values (#{email}, #{password}, #{name}, #{phone}, #{address}, #{role})
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.home.member.Member">
+        select * from members where id = #{id}
+    </select>
+
+    <select id="findByEmail" resultType="com.ssafy.home.member.Member">
+        select * from members where email = #{email}
+    </select>
+
+    <select id="findAll" resultType="com.ssafy.home.member.Member">
+        select * from members
+        <where>
+            <if test="keyword != null and keyword != ''">
+                name like concat('%', #{keyword}, '%') or email like concat('%', #{keyword}, '%')
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <update id="update" parameterType="com.ssafy.home.member.Member">
+        update members
+        set name = #{name},
+            phone = #{phone},
+            address = #{address},
+            password = #{password},
+            updated_at = current_timestamp
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from members where id = #{id}
+    </delete>
+</mapper>

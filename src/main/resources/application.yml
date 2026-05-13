@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: ssafyhome
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ssafyhome?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+mybatis:
+  mapper-locations: classpath:/mapper/**/*.xml
+  type-aliases-package: com.ssafy.home
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  servlet:
+    session:
+      timeout: 60m
+
+app:
+  public-data:
+    service-key: ${PUBLIC_DATA_SERVICE_KEY:6XV%2FiicTsaTACw3woK4CTq%2BTrPOUDMUMy0gDOA7El5l2CK%2BkymZycVG1lldhB46DBGfA0xUrYkHDo8Bz5JozsQ%3D%3D}
+  vworld:
+    sido-key: ${VWORLD_SIDO_KEY:107AC27E-959D-3394-9CF3-9EECB263CDAB}
+    sigungu-key: ${VWORLD_SIGUNGU_KEY:5F98DE24-1A57-3C20-AF76-EECE79F30F78}
+    dong-key: ${VWORLD_DONG_KEY:A0E3DCDC-139C-3214-BA8A-D08F7B6FF46A}
+  sgis:
+    consumer-key: ${SGIS_CONSUMER_KEY:5e47c5b0da1c41799046}
+    consumer-secret: ${SGIS_CONSUMER_SECRET:66fa3922c2a949ee991b}

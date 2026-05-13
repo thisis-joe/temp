@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.home.notice.NoticeMapper">
+    <insert id="insert" parameterType="com.ssafy.home.notice.Notice" useGeneratedKeys="true" keyProperty="id">
+        insert into notices (title, content, writer_id)
+        values (#{title}, #{content}, #{writerId})
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.home.notice.Notice">
+        select * from notices where id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.ssafy.home.notice.Notice">
+        select * from notices
+        <where>
+            <if test="keyword != null and keyword != ''">
+                title like concat('%', #{keyword}, '%') or content like concat('%', #{keyword}, '%')
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <update id="update" parameterType="com.ssafy.home.notice.Notice">
+        update notices
+        set title = #{title}, content = #{content}, updated_at = current_timestamp
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from notices where id = #{id}
+    </delete>
+
+    <update id="increaseViewCount">
+        update notices set view_count = view_count + 1 where id = #{id}
+    </update>
+</mapper>

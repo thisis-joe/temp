@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.home.deal.DealMapper">
+    <insert id="insert" parameterType="com.ssafy.home.deal.PropertyDeal" useGeneratedKeys="true" keyProperty="id">
+        insert into property_deals (
+            deal_type, lawd_cd, umd_nm, house_name, house_type, jibun, road_name, build_year,
+            exclusive_area, land_area, deal_year, deal_month, deal_day, deal_amount, deposit,
+            monthly_rent, floor, deal_gbn, raw_xml
+        ) values (
+            #{dealType}, #{lawdCd}, #{umdNm}, #{houseName}, #{houseType}, #{jibun}, #{roadName}, #{buildYear},
+            #{exclusiveArea}, #{landArea}, #{dealYear}, #{dealMonth}, #{dealDay}, #{dealAmount}, #{deposit},
+            #{monthlyRent}, #{floor}, #{dealGbn}, #{rawXml}
+        )
+    </insert>
+
+    <select id="search" resultType="com.ssafy.home.deal.PropertyDeal">
+        select * from property_deals
+        <where>
+            <if test="dealType != null">deal_type = #{dealType}</if>
+            <if test="lawdCd != null">and lawd_cd = #{lawdCd}</if>
+            <if test="dong != null">and umd_nm like concat('%', #{dong}, '%')</if>
+            <if test="houseName != null">and house_name like concat('%', #{houseName}, '%')</if>
+            <if test="dealYmd != null and dealYmd.length() == 6">
+                and deal_year = cast(substring(#{dealYmd}, 1, 4) as int)
+                and deal_month = cast(substring(#{dealYmd}, 5, 2) as int)
+            </if>
+        </where>
+        order by deal_year desc, deal_month desc, deal_day desc, id desc
+        limit 200
+    </select>
+
+    <select id="countByTypeAndMonth" resultType="int">
+        select count(*) from property_deals
+        where deal_type = #{dealType}
+          and lawd_cd = #{lawdCd}
+          and deal_year = cast(substring(#{dealYmd}, 1, 4) as int)
+          and deal_month = cast(substring(#{dealYmd}, 5, 2) as int)
+    </select>
+</mapper>
