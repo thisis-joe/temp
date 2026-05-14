@@ -1,15 +1,28 @@
 spring:
+  # 애플리케이션 이름입니다. 로그, Actuator 확장, 배포 식별에 영향을 줍니다.
   application:
     name: ssafyhome
+
+  # Controller가 반환한 view name을 JSP 실제 경로로 바꿉니다. 예: "home" -> /WEB-INF/views/home.jsp
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  # MySQL 연결 정보입니다. 환경변수로 덮어쓸 수 있으며 기본 계정은 ssafy/ssafy입니다.
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/ssafyhome?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ssafy_home?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:ssafy}
+    password: ${DB_PASSWORD:ssafy}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # schema.sql을 항상 실행합니다. create table if not exists 구조라 기존 데이터는 유지됩니다.
   sql:
     init:
       mode: always
       encoding: UTF-8
+
+# MyBatis XML Mapper 위치와 snake_case -> camelCase 자동 매핑 설정입니다.
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
   type-aliases-package: com.ssafy.home
@@ -17,17 +30,28 @@ mybatis:
     map-underscore-to-camel-case: true
 
 server:
+  # 로그인 세션 유지 시간입니다. LoginCheckInterceptor와 AuthController의 세션 기반 인증에 영향이 있습니다.
   servlet:
     session:
       timeout: 60m
 
+logging:
+  # 실제 상세 포맷과 rolling 정책은 logback-spring.xml에서 관리합니다.
+  file:
+    name: logs/ssafyhome.log
+  level:
+    com.ssafy.home: INFO
+
 app:
+  # data.go.kr 실거래 API 인증키입니다. URL 인코딩된 키를 기본값으로 사용합니다.
   public-data:
     service-key: ${PUBLIC_DATA_SERVICE_KEY:6XV%2FiicTsaTACw3woK4CTq%2BTrPOUDMUMy0gDOA7El5l2CK%2BkymZycVG1lldhB46DBGfA0xUrYkHDo8Bz5JozsQ%3D%3D}
+
+  # VWorld 지역 API 인증키입니다. RegionService의 VWorld 호출 전체에 공통 적용됩니다.
   vworld:
-    sido-key: ${VWORLD_SIDO_KEY:107AC27E-959D-3394-9CF3-9EECB263CDAB}
-    sigungu-key: ${VWORLD_SIGUNGU_KEY:5F98DE24-1A57-3C20-AF76-EECE79F30F78}
-    dong-key: ${VWORLD_DONG_KEY:A0E3DCDC-139C-3214-BA8A-D08F7B6FF46A}
+    key: ${VWORLD_KEY:A0E3DCDC-139C-3214-BA8A-D08F7B6FF46A}
+
+  # SGIS 토큰 발급용 키입니다. RegionService의 /api/regions/sgis-token 호출에 영향이 있습니다.
   sgis:
     consumer-key: ${SGIS_CONSUMER_KEY:5e47c5b0da1c41799046}
     consumer-secret: ${SGIS_CONSUMER_SECRET:66fa3922c2a949ee991b}

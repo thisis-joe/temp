@@ -1,5 +1,7 @@
 package com.ssafy.home.deal;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,43 +20,68 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 @EnableConfigurationProperties(PublicDataProperties.class)
+@RequiredArgsConstructor
+@Slf4j
 public class DealService {
     private final DealMapper dealMapper;
     private final RestClient restClient;
     private final PublicDataProperties properties;
 
-    public DealService(DealMapper dealMapper, RestClient restClient, PublicDataProperties properties) {
-        this.dealMapper = dealMapper;
-        this.restClient = restClient;
-        this.properties = properties;
-    }
-
     @Transactional
     public List<PropertyDeal> fetchAndSave(DealType type, String lawdCd, String dealYmd, int numOfRows) {
         validateSearch(lawdCd, dealYmd);
-        // UriComponentsBuilder를 사용하면 파라미터가 많아져도 URL을 안전하게 조립할 수 있다.
-        String url = UriComponentsBuilder.fromHttpUrl(type.url())
-                .queryParam("serviceKey", properties.serviceKey())
+        int requestedRows = Math.max(1, Math.min(numOfRows, 500));
+        String query = UriComponentsBuilder.newInstance()
                 .queryParam("LAWD_CD", lawdCd)
                 .queryParam("DEAL_YMD", dealYmd)
                 .queryParam("pageNo", 1)
-                .queryParam("numOfRows", Math.max(1, Math.min(numOfRows, 500)))
-                .build(false)
+                .queryParam("numOfRows", requestedRows)
+                .build()
                 .toUriString();
-        String xml = restClient.get().uri(url).retrieve().body(String.class);
+        URI uri = URI.create(type.url() + "?serviceKey=" + properties.serviceKey() + "&" + query.substring(1));
+        log.info("공공데이터 실거래 호출 시작. type={}, lawdCd={}, dealYmd={}, requestedRows={}, endpoint={}",
+                type, lawdCd, dealYmd, requestedRows, type.url());
+        String xml = restClient.get().uri(uri).retrieve().body(String.class);
         List<PropertyDeal> deals = parse(type, lawdCd, xml);
-        // MyBatis Mapper를 통해 파싱된 데이터를 한 건씩 insert한다.
+        int deleted = dealMapper.deleteByTypeAndMonth(type.name(), lawdCd, dealYmd);
         deals.forEach(dealMapper::insert);
+        log.info("공공데이터 실거래 저장 완료. type={}, lawdCd={}, dealYmd={}, deletedRows={}, insertedRows={}",
+                type, lawdCd, dealYmd, deleted, deals.size());
         return deals;
     }
 
+    @Transactional
+    public List<DealFetchResult> fetchAllAndSave(String lawdCd, String dealYmd, int numOfRows) {
+        validateSearch(lawdCd, dealYmd);
+        log.info("공공데이터 4개 API 통합 수집 시작. lawdCd={}, dealYmd={}, requestedRowsPerApi={}", lawdCd, dealYmd, numOfRows);
+        List<DealFetchResult> results = Arrays.stream(DealType.values())
+                .map(type -> new DealFetchResult(type, fetchAndSave(type, lawdCd, dealYmd, numOfRows).size()))
+                .toList();
+        int savedRows = results.stream().mapToInt(DealFetchResult::savedCount).sum();
+        log.info("공공데이터 4개 API 통합 수집 종료. lawdCd={}, dealYmd={}, apiCount={}, savedRows={}, detail={}",
+                lawdCd, dealYmd, results.size(), savedRows, results);
+        return results;
+    }
+
     public List<PropertyDeal> search(String dealType, String lawdCd, String dong, String houseName, String dealYmd) {
-        return dealMapper.search(blankToNull(dealType), blankToNull(lawdCd), blankToNull(dong), blankToNull(houseName), blankToNull(dealYmd));
+        List<PropertyDeal> deals = dealMapper.search(blankToNull(dealType), blankToNull(lawdCd), blankToNull(dong), blankToNull(houseName), blankToNull(dealYmd));
+        log.info("실거래 DB 검색 완료. dealType={}, lawdCd={}, dong={}, houseName={}, dealYmd={}, resultCount={}",
+                dealType, lawdCd, dong, houseName, dealYmd, deals.size());
+        return deals;
+    }
+
+    public List<DealSummary> summarize(String lawdCd, String dealYmd) {
+        validateSearch(lawdCd, dealYmd);
+        List<DealSummary> summaries = dealMapper.summarize(lawdCd, dealYmd);
+        log.info("실거래 월간 시세 요약 조회 완료. lawdCd={}, dealYmd={}, summaryCount={}", lawdCd, dealYmd, summaries.size());
+        return summaries;
     }
 
     public int countByMonth(DealType type, String lawdCd, String dealYmd) {
@@ -63,7 +90,6 @@ public class DealService {
 
     private List<PropertyDeal> parse(DealType type, String lawdCd, String xml) {
         try {
-            // 공공데이터 응답은 XML이므로 DOM 파서로 item 태그 목록을 읽는다.
             Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                     .parse(new InputSource(new StringReader(xml)));
             String resultCode = text(document.getDocumentElement(), "resultCode");
@@ -71,10 +97,12 @@ public class DealService {
                 throw new IllegalArgumentException("공공데이터 API 오류: " + resultCode + " " + text(document.getDocumentElement(), "resultMsg"));
             }
             NodeList items = document.getElementsByTagName("item");
-            return java.util.stream.IntStream.range(0, items.getLength())
+            List<PropertyDeal> deals = java.util.stream.IntStream.range(0, items.getLength())
                     .mapToObj(i -> (Element) items.item(i))
                     .map(item -> toDeal(type, lawdCd, item))
                     .toList();
+            log.info("공공데이터 XML 파싱 완료. type={}, lawdCd={}, itemCount={}", type, lawdCd, deals.size());
+            return deals;
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
@@ -84,7 +112,6 @@ public class DealService {
 
     private PropertyDeal toDeal(DealType type, String lawdCd, Element item) {
         PropertyDeal deal = new PropertyDeal();
-        // API마다 태그명이 조금씩 달라서 공통 도메인(PropertyDeal)에 맞춰 변환한다.
         deal.setDealType(type.name());
         deal.setLawdCd(firstText(item, "sggCd", null, lawdCd));
         deal.setUmdNm(text(item, "umdNm"));
@@ -109,7 +136,7 @@ public class DealService {
 
     private static void validateSearch(String lawdCd, String dealYmd) {
         if (lawdCd == null || !lawdCd.matches("\\d{5}")) {
-            throw new IllegalArgumentException("LAWD_CD는 법정동코드 앞 5자리여야 합니다.");
+            throw new IllegalArgumentException("LAWD_CD는 법정동 코드 앞 5자리여야 합니다.");
         }
         if (dealYmd == null || !dealYmd.matches("\\d{6}")) {
             throw new IllegalArgumentException("DEAL_YMD는 yyyyMM 형식이어야 합니다.");

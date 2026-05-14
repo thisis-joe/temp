@@ -31,7 +31,46 @@ create table if not exists property_deals (
     floor varchar(20),
     deal_gbn varchar(60),
     raw_xml text,
-    created_at timestamp not null default current_timestamp
+    created_at timestamp not null default current_timestamp,
+    index idx_property_deals_region_month (lawd_cd, deal_year, deal_month),
+    index idx_property_deals_type_month (deal_type, lawd_cd, deal_year, deal_month)
+);
+
+create table if not exists dongcodes (
+    dong_code varchar(10) not null primary key,
+    sido_name varchar(30),
+    gugun_name varchar(30),
+    dong_name varchar(30)
+);
+
+create table if not exists houseinfos (
+    apt_seq varchar(20) not null primary key,
+    sgg_cd varchar(5),
+    umd_cd varchar(5),
+    umd_nm varchar(20),
+    jibun varchar(10),
+    road_nm_sgg_cd varchar(5),
+    road_nm varchar(20),
+    road_nm_bonbun varchar(10),
+    road_nm_bubun varchar(10),
+    apt_nm varchar(40),
+    build_year int,
+    latitude varchar(45),
+    longitude varchar(45)
+);
+
+create table if not exists housedeals (
+    no int auto_increment primary key,
+    apt_seq varchar(20),
+    apt_dong varchar(40),
+    floor varchar(3),
+    deal_year int,
+    deal_month int,
+    deal_day int,
+    exclu_use_ar decimal(7, 2),
+    deal_amount varchar(10),
+    index idx_housedeals_apt_seq (apt_seq),
+    constraint fk_housedeals_houseinfos foreign key (apt_seq) references houseinfos(apt_seq)
 );
 
 create table if not exists favorites (

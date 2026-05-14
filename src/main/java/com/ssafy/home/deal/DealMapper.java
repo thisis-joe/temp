@@ -9,6 +9,8 @@ import java.util.List;
 public interface DealMapper {
     int insert(PropertyDeal deal);
 
+    int deleteByTypeAndMonth(@Param("dealType") String dealType, @Param("lawdCd") String lawdCd, @Param("dealYmd") String dealYmd);
+
     List<PropertyDeal> search(
             @Param("dealType") String dealType,
             @Param("lawdCd") String lawdCd,
@@ -18,4 +20,6 @@ public interface DealMapper {
     );
 
     int countByTypeAndMonth(@Param("dealType") String dealType, @Param("lawdCd") String lawdCd, @Param("dealYmd") String dealYmd);
+
+    List<DealSummary> summarize(@Param("lawdCd") String lawdCd, @Param("dealYmd") String dealYmd);
 }

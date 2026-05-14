@@ -25,18 +25,38 @@ Spring Boot와 MyBatis 기반의 주택 실거래가 검색 서비스입니다.
 
 브라우저에서 `http://localhost:8080`으로 접속합니다.
 
-DB는 MySQL만 사용합니다. 기본 접속 정보는 `root` 계정, 빈 비밀번호, `ssafyhome` 데이터베이스입니다. 다른 계정을 쓰려면 환경변수를 지정합니다.
+패키징 후 실행하려면 JSP 포함을 위해 생성된 WAR 파일을 실행합니다.
+
+```bash
+./mvnw clean package
+java -jar target/ssafyhome-0.0.1-SNAPSHOT.war
+```
+
+DB는 MySQL만 사용합니다. 기본 접속 정보는 `ssafy` 계정, `ssafy` 비밀번호, `ssafyhome` 데이터베이스입니다. 다른 계정을 쓰려면 환경변수를 지정합니다.
 
 ```bash
 DB_URL=jdbc:mysql://localhost:3306/ssafyhome?createDatabaseIfNotExist=true \
-DB_USERNAME=root \
-DB_PASSWORD=비밀번호 \
+DB_USERNAME=ssafy \
+DB_PASSWORD=ssafy \
 ./mvnw spring-boot:run
 ```
 
 STS에서는 프로젝트를 `Existing Maven Projects`로 import한 뒤 `SsafyhomeApplication.java`를 `Run As > Spring Boot App`으로 실행합니다.
 
 공공데이터 인증키는 `application.yml`에 기본값으로 넣어두었습니다. 포털 승인 상태나 실행 환경에 따라 Encoding/Decoding 키 중 동작하는 값이 다를 수 있으므로, 필요하면 `PUBLIC_DATA_SERVICE_KEY` 환경변수로 교체합니다.
+
+## JSP 화면
+
+| 화면 | URL |
+| --- | --- |
+| 홈 | `/` |
+| 실거래가 | `/deals` |
+| 회원 | `/members` |
+| 관심지역 | `/favorites` |
+| 공지사항 | `/notices` |
+| 지역 API | `/regions` |
+
+등록, 수정, 삭제, 수집, 로그인, 로그아웃 같은 작업은 STS 콘솔과 `logs/ssafyhome.log`에 기록됩니다. 각 JSP 화면의 `로그 확인` 버튼은 `/api/logs?category=...` API를 호출해 해당 기능의 최근 작업 로그를 보여줍니다.
 
 ## 주요 API
 

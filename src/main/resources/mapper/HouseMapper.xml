@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.home.house.HouseMapper">
+    <select id="searchDongCodes" resultType="com.ssafy.home.house.DongCodeDto">
+        select dong_code, sido_name, gugun_name, dong_name
+        from dongcodes
+        <where>
+            dong_name is not null
+            <if test="keyword != null and keyword != ''">
+                and (
+                    sido_name like concat('%', #{keyword}, '%')
+                    or gugun_name like concat('%', #{keyword}, '%')
+                    or dong_name like concat('%', #{keyword}, '%')
+                    or dong_code like concat(#{keyword}, '%')
+                )
+            </if>
+        </where>
+        order by dong_code
+        limit 100
+    </select>
+
+    <select id="searchHouses" resultType="com.ssafy.home.house.HouseInfoDto">
+        select
+            h.apt_seq,
+            h.sgg_cd,
+            h.umd_cd,
+            d.sido_name,
+            d.gugun_name,
+            d.dong_name,
+            h.umd_nm,
+            h.jibun,
+            h.road_nm,
+            h.apt_nm,
+            h.build_year,
+            h.latitude,
+            h.longitude,
+            count(hd.no) as deal_count,
+            max(hd.deal_year) as latest_deal_year,
+            substring_index(
+                group_concat(hd.deal_month order by hd.deal_year desc, hd.deal_month desc, hd.deal_day desc, hd.no desc),
+                ',',
+                1
+            ) as latest_deal_month,
+            substring_index(
+                group_concat(hd.deal_amount order by hd.deal_year desc, hd.deal_month desc, hd.deal_day desc, hd.no desc),
+                ',',
+                1
+            ) as latest_deal_amount
+        from houseinfos h
+        left join dongcodes d on d.dong_code = concat(h.sgg_cd, h.umd_cd)
+        left join housedeals hd on hd.apt_seq = h.apt_seq
+        <where>
+            <if test="dongCode != null and dongCode != ''">
+                concat(h.sgg_cd, h.umd_cd) = #{dongCode}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    h.apt_nm like concat('%', #{keyword}, '%')
+                    or h.umd_nm like concat('%', #{keyword}, '%')
+                    or h.road_nm like concat('%', #{keyword}, '%')
+                    or d.sido_name like concat('%', #{keyword}, '%')
+                    or d.gugun_name like concat('%', #{keyword}, '%')
+                    or d.dong_name like concat('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        group by
+            h.apt_seq, h.sgg_cd, h.umd_cd, d.sido_name, d.gugun_name, d.dong_name,
+            h.umd_nm, h.jibun, h.road_nm, h.apt_nm, h.build_year, h.latitude, h.longitude
+        order by deal_count desc, h.apt_nm
+        limit 100
+    </select>
+
+    <select id="findHouse" resultType="com.ssafy.home.house.HouseInfoDto">
+        select
+            h.apt_seq,
+            h.sgg_cd,
+            h.umd_cd,
+            d.sido_name,
+            d.gugun_name,
+            d.dong_name,
+            h.umd_nm,
+            h.jibun,
+            h.road_nm,
+            h.apt_nm,
+            h.build_year,
+            h.latitude,
+            h.longitude,
+            count(hd.no) as deal_count,
+            max(hd.deal_year) as latest_deal_year,
+            substring_index(
+                group_concat(hd.deal_month order by hd.deal_year desc, hd.deal_month desc, hd.deal_day desc, hd.no desc),
+                ',',
+                1
+            ) as latest_deal_month,
+            substring_index(
+                group_concat(hd.deal_amount order by hd.deal_year desc, hd.deal_month desc, hd.deal_day desc, hd.no desc),
+                ',',
+                1
+            ) as latest_deal_amount
+        from houseinfos h
+        left join dongcodes d on d.dong_code = concat(h.sgg_cd, h.umd_cd)
+        left join housedeals hd on hd.apt_seq = h.apt_seq
+        where h.apt_seq = #{aptSeq}
+        group by
+            h.apt_seq, h.sgg_cd, h.umd_cd, d.sido_name, d.gugun_name, d.dong_name,
+            h.umd_nm, h.jibun, h.road_nm, h.apt_nm, h.build_year, h.latitude, h.longitude
+    </select>
+
+    <select id="findDeals" resultType="com.ssafy.home.house.HouseDealDto">
+        select no, apt_seq, apt_dong, floor, deal_year, deal_month, deal_day, exclu_use_ar, deal_amount
+        from housedeals
+        where apt_seq = #{aptSeq}
+        order by deal_year desc, deal_month desc, deal_day desc, no desc
+        limit 200
+    </select>
+</mapper>

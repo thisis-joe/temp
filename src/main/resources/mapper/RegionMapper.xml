@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.home.region.RegionMapper">
+    <select id="findSidos" resultType="com.ssafy.home.region.RegionCodeDto">
+        select left(dong_code, 2) as code,
+               sido_name,
+               null as gugun_name,
+               null as dong_name
+        from dongcodes
+        group by left(dong_code, 2), sido_name
+        order by code
+    </select>
+
+    <select id="findSigungus" resultType="com.ssafy.home.region.RegionCodeDto">
+        select left(dong_code, 5) as code,
+               sido_name,
+               gugun_name,
+               null as dong_name
+        from dongcodes
+        where left(dong_code, 2) = #{sidoCode}
+          and gugun_name is not null
+          and gugun_name != ''
+        group by left(dong_code, 5), sido_name, gugun_name
+        order by code
+    </select>
+
+    <select id="findDongs" resultType="com.ssafy.home.region.RegionCodeDto">
+        select dong_code as code,
+               sido_name,
+               gugun_name,
+               dong_name
+        from dongcodes
+        where left(dong_code, 5) = #{sigunguCode}
+        order by dong_code
+    </select>
+</mapper>
