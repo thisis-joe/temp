@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.home.region.RegionMapper">
+    <!-- 시도 목록입니다. dong_code 앞 2자리 기준으로 그룹화해 중복 지역을 제거합니다. -->
     <select id="findSidos" resultType="com.ssafy.home.region.RegionCodeDto">
         select left(dong_code, 2) as code,
                sido_name,
@@ -12,6 +13,7 @@
         order by code
     </select>
 
+    <!-- 선택한 시도 코드의 시군구 목록입니다. dong_code 앞 5자리를 법정동 지역 코드로 사용합니다. -->
     <select id="findSigungus" resultType="com.ssafy.home.region.RegionCodeDto">
         select left(dong_code, 5) as code,
                sido_name,
@@ -25,6 +27,7 @@
         order by code
     </select>
 
+    <!-- 선택한 시군구 코드에 속한 전체 동 목록입니다. 관심지역/검색 조건 선택에 사용합니다. -->
     <select id="findDongs" resultType="com.ssafy.home.region.RegionCodeDto">
         select dong_code as code,
                sido_name,

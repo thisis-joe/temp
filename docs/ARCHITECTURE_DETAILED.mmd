@@ -1,0 +1,165 @@
+flowchart TB
+    subgraph Client["Client Layer"]
+        User["일반 사용자"]
+        AdminUser["관리자 사용자"]
+        Browser["Browser"]
+        JSP["JSP Views<br/>home/deals/houses/members/favorites/notices/regions/admin"]
+        Static["Static Resources<br/>app.css + common.js + feature JS"]
+    end
+
+    subgraph Web["Web Layer"]
+        PageController["PageController<br/>JSP 라우팅"]
+        AuthController["AuthController<br/>register/login/logout/me"]
+        MemberController["MemberController<br/>members CRUD"]
+        DealController["DealController<br/>fetch/search/summary"]
+        HouseController["HouseController<br/>dongcodes/houses/detail"]
+        FavoriteController["FavoriteController<br/>favorites CRUD"]
+        NoticeController["NoticeController<br/>notices CRUD"]
+        RegionController["RegionController<br/>DB/VWorld/SGIS regions"]
+        AdminController["AdminController<br/>overview/tables/rows"]
+        OperationLogController["OperationLogController<br/>operation logs"]
+    end
+
+    subgraph CrossCutting["Cross Cutting Layer"]
+        RequestInterceptor["RequestLoggingInterceptor<br/>REQUEST_START/END<br/>MDC requestId"]
+        LoginInterceptor["LoginCheckInterceptor<br/>session LOGIN_MEMBER_ID 검사"]
+        ServiceAspect["ServiceLoggingAspect<br/>@Before params<br/>@AfterReturning return"]
+        GlobalException["GlobalExceptionHandler<br/>400/401/502/500 JSON"]
+        Logback["Logback<br/>console<br/>logs/ssafyhome.log<br/>logs/ssafyhome-error.log"]
+    end
+
+    subgraph Service["Service Layer"]
+        MemberService["MemberService<br/>BCrypt + member business"]
+        DealService["DealService<br/>external API + XML parse + deal storage"]
+        HouseService["HouseService<br/>house search/detail"]
+        FavoriteService["FavoriteService<br/>member-owned favorites"]
+        NoticeService["NoticeService<br/>notice CRUD + view count"]
+        RegionService["RegionService<br/>dongcodes + VWorld + SGIS"]
+        OperationLogService["OperationLogService<br/>in-memory operation log + file log"]
+    end
+
+    subgraph Persistence["Persistence Layer"]
+        MemberMapper["MemberMapper<br/>MemberMapper.xml"]
+        DealMapper["DealMapper<br/>DealMapper.xml"]
+        HouseMapper["HouseMapper<br/>HouseMapper.xml"]
+        FavoriteMapper["FavoriteMapper<br/>FavoriteMapper.xml"]
+        NoticeMapper["NoticeMapper<br/>NoticeMapper.xml"]
+        RegionMapper["RegionMapper<br/>RegionMapper.xml"]
+        JdbcTemplate["JdbcTemplate<br/>admin allowed table query"]
+    end
+
+    subgraph DB["MySQL ssafy_home"]
+        MEMBERS["members"]
+        FAVORITES["favorites"]
+        NOTICES["notices"]
+        DONGCODES["dongcodes"]
+        HOUSEINFOS["houseinfos"]
+        HOUSEDEALS["housedeals"]
+        PROPERTYDEALS["property_deals"]
+    end
+
+    subgraph External["External APIs"]
+        PublicData["data.go.kr<br/>APT/RH trade/rent"]
+        VWorld["VWorld<br/>administrative regions"]
+        SGIS["SGIS<br/>token"]
+    end
+
+    User --> Browser
+    AdminUser --> Browser
+    Browser --> PageController
+    PageController --> JSP
+    JSP --> Static
+    Static --> AuthController
+    Static --> MemberController
+    Static --> DealController
+    Static --> HouseController
+    Static --> FavoriteController
+    Static --> NoticeController
+    Static --> RegionController
+    Static --> AdminController
+    Static --> OperationLogController
+
+    RequestInterceptor --> PageController
+    RequestInterceptor --> AuthController
+    RequestInterceptor --> MemberController
+    RequestInterceptor --> DealController
+    RequestInterceptor --> HouseController
+    RequestInterceptor --> FavoriteController
+    RequestInterceptor --> NoticeController
+    RequestInterceptor --> RegionController
+    RequestInterceptor --> AdminController
+    RequestInterceptor --> OperationLogController
+
+    LoginInterceptor --> FavoriteController
+    LoginInterceptor --> AdminController
+    LoginInterceptor --> OperationLogController
+    LoginInterceptor --> DealController
+
+    AuthController --> MemberService
+    MemberController --> MemberService
+    DealController --> DealService
+    HouseController --> HouseService
+    FavoriteController --> FavoriteService
+    NoticeController --> NoticeService
+    RegionController --> RegionService
+    AdminController --> OperationLogService
+    OperationLogController --> OperationLogService
+
+    ServiceAspect --> MemberService
+    ServiceAspect --> DealService
+    ServiceAspect --> HouseService
+    ServiceAspect --> FavoriteService
+    ServiceAspect --> NoticeService
+    ServiceAspect --> RegionService
+    ServiceAspect --> OperationLogService
+
+    MemberService --> MemberMapper
+    DealService --> DealMapper
+    HouseService --> HouseMapper
+    FavoriteService --> FavoriteMapper
+    NoticeService --> NoticeMapper
+    RegionService --> RegionMapper
+    AdminController --> JdbcTemplate
+
+    DealService --> PublicData
+    RegionService --> VWorld
+    RegionService --> SGIS
+
+    MemberMapper --> MEMBERS
+    FavoriteMapper --> FAVORITES
+    NoticeMapper --> NOTICES
+    DealMapper --> PROPERTYDEALS
+    HouseMapper --> DONGCODES
+    HouseMapper --> HOUSEINFOS
+    HouseMapper --> HOUSEDEALS
+    RegionMapper --> DONGCODES
+    JdbcTemplate --> MEMBERS
+    JdbcTemplate --> FAVORITES
+    JdbcTemplate --> NOTICES
+    JdbcTemplate --> DONGCODES
+    JdbcTemplate --> HOUSEINFOS
+    JdbcTemplate --> HOUSEDEALS
+    JdbcTemplate --> PROPERTYDEALS
+
+    MEMBERS -->|"1:N member_id<br/>ON DELETE CASCADE"| FAVORITES
+    MEMBERS -->|"1:N writer_id<br/>ON DELETE SET NULL"| NOTICES
+    HOUSEINFOS -->|"1:N apt_seq"| HOUSEDEALS
+    DONGCODES -. "조회 조인<br/>dong_code = concat(sgg_cd, umd_cd)" .-> HOUSEINFOS
+    DONGCODES -. "업무 참조<br/>lawd_cd/region code" .-> PROPERTYDEALS
+    DONGCODES -. "업무 참조<br/>lawd_cd" .-> FAVORITES
+
+    GlobalException --> Logback
+    RequestInterceptor --> Logback
+    ServiceAspect --> Logback
+    OperationLogService --> Logback
+
+    subgraph Protected["Protected Routes"]
+        P1["/favorites"]
+        P2["/admin"]
+        P3["/api/favorites/**"]
+        P4["/api/admin/**"]
+        P5["/api/logs/**"]
+        P6["/api/deals/fetch*"]
+    end
+
+    LoginInterceptor --> Protected

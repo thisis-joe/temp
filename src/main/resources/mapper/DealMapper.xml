@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.home.deal.DealMapper">
+    <!-- 외부 API에서 파싱한 실거래 1건을 property_deals에 저장합니다. keyProperty=id로 생성 PK를 Java 객체에 되돌립니다. -->
     <insert id="insert" parameterType="com.ssafy.home.deal.PropertyDeal" useGeneratedKeys="true" keyProperty="id">
         insert into property_deals (
             deal_type, lawd_cd, umd_nm, house_name, house_type, jibun, road_name, build_year,
@@ -14,6 +15,7 @@
         )
     </insert>
 
+    <!-- 같은 거래유형/지역/월을 다시 수집할 때 기존 데이터를 먼저 지워 중복 저장을 방지합니다. -->
     <delete id="deleteByTypeAndMonth">
         delete from property_deals
         where deal_type = #{dealType}
@@ -22,6 +24,7 @@
           and deal_month = cast(substring(#{dealYmd}, 5, 2) as unsigned)
     </delete>
 
+    <!-- 실거래 화면의 DB 검색입니다. 조건이 비어 있으면 생략하고, 화면 과부하를 막기 위해 200건으로 제한합니다. -->
     <select id="search" resultType="com.ssafy.home.deal.PropertyDeal">
         select * from property_deals
         <where>
@@ -38,6 +41,7 @@
         limit 200
     </select>
 
+    <!-- 수집 후 해당 월 데이터가 몇 건 저장되었는지 검증하고 결과 메시지에 사용합니다. -->
     <select id="countByTypeAndMonth" resultType="int">
         select count(*) from property_deals
         where deal_type = #{dealType}
@@ -46,6 +50,7 @@
           and deal_month = cast(substring(#{dealYmd}, 5, 2) as unsigned)
     </select>
 
+    <!-- 거래유형별 월간 시세 카드/표에 필요한 최소·평균·최대값과 면적당 가격을 계산합니다. -->
     <select id="summarize" resultType="com.ssafy.home.deal.DealSummary">
         select deal_type,
                count(*) as deal_count,

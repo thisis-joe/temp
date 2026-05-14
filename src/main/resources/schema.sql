@@ -1,3 +1,4 @@
+-- 회원 계정과 세션 로그인 기준 테이블입니다. favorites/notices가 members.id를 참조합니다.
 create table if not exists members (
     id bigint auto_increment primary key,
     email varchar(120) not null unique,
@@ -10,6 +11,7 @@ create table if not exists members (
     updated_at timestamp not null default current_timestamp on update current_timestamp
 );
 
+-- data.go.kr에서 수집한 아파트/연립다세대 매매·전월세 실거래 통합 저장소입니다.
 create table if not exists property_deals (
     id bigint auto_increment primary key,
     deal_type varchar(30) not null,
@@ -36,6 +38,7 @@ create table if not exists property_deals (
     index idx_property_deals_type_month (deal_type, lawd_cd, deal_year, deal_month)
 );
 
+-- 법정동 코드 기준 테이블입니다. 지역 선택, 단지 검색 지역명 표시, 관심지역 코드 입력에 사용합니다.
 create table if not exists dongcodes (
     dong_code varchar(10) not null primary key,
     sido_name varchar(30),
@@ -43,6 +46,7 @@ create table if not exists dongcodes (
     dong_name varchar(30)
 );
 
+-- 아파트 단지 기본정보입니다. housedeals와 apt_seq로 연결됩니다.
 create table if not exists houseinfos (
     apt_seq varchar(20) not null primary key,
     sgg_cd varchar(5),
@@ -59,6 +63,7 @@ create table if not exists houseinfos (
     longitude varchar(45)
 );
 
+-- 단지별 거래 이력입니다. houseinfos.apt_seq를 참조하며 단지 상세 화면의 거래 내역에 사용됩니다.
 create table if not exists housedeals (
     no int auto_increment primary key,
     apt_seq varchar(20),
@@ -73,6 +78,7 @@ create table if not exists housedeals (
     constraint fk_housedeals_houseinfos foreign key (apt_seq) references houseinfos(apt_seq)
 );
 
+-- 회원별 관심지역입니다. member_id 기준으로 소유권을 제한하고 회원 삭제 시 함께 삭제됩니다.
 create table if not exists favorites (
     id bigint auto_increment primary key,
     member_id bigint not null,
@@ -85,6 +91,7 @@ create table if not exists favorites (
     constraint fk_favorites_member foreign key (member_id) references members(id) on delete cascade
 );
 
+-- 공지사항입니다. writer_id는 회원 삭제 시 null 처리되어 공지 내용은 유지됩니다.
 create table if not exists notices (
     id bigint auto_increment primary key,
     title varchar(200) not null,

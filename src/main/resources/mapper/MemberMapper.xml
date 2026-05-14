@@ -2,19 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.home.member.MemberMapper">
+    <!-- 회원가입 시 BCrypt로 암호화된 비밀번호를 포함해 저장하고 생성된 id를 Java 객체에 반영합니다. -->
     <insert id="insert" parameterType="com.ssafy.home.member.Member" useGeneratedKeys="true" keyProperty="id">
         insert into members (email, password, name, phone, address, role)
         values (#{email}, #{password}, #{name}, #{phone}, #{address}, #{role})
     </insert>
 
+    <!-- 세션의 LOGIN_MEMBER_ID로 현재 로그인 사용자를 조회할 때 사용합니다. -->
     <select id="findById" resultType="com.ssafy.home.member.Member">
         select * from members where id = #{id}
     </select>
 
+    <!-- 로그인 검증과 이메일 중복 확인에 사용합니다. email은 DB에서 unique입니다. -->
     <select id="findByEmail" resultType="com.ssafy.home.member.Member">
         select * from members where email = #{email}
     </select>
 
+    <!-- 관리자/회원 관리 화면의 목록 조회입니다. 이름 또는 이메일로 부분 검색합니다. -->
     <select id="findAll" resultType="com.ssafy.home.member.Member">
         select * from members
         <where>
@@ -25,6 +29,7 @@
         order by id desc
     </select>
 
+    <!-- 회원 정보 수정입니다. 비밀번호도 함께 갱신되므로 Service에서 암호화 후 호출해야 합니다. -->
     <update id="update" parameterType="com.ssafy.home.member.Member">
         update members
         set name = #{name},
@@ -35,6 +40,7 @@
         where id = #{id}
     </update>
 
+    <!-- 회원 삭제입니다. favorites는 FK cascade, notices writer_id는 set null 정책의 영향을 받습니다. -->
     <delete id="delete">
         delete from members where id = #{id}
     </delete>

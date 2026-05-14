@@ -1,0 +1,35 @@
+flowchart LR
+    Browser["Browser<br/>사용자/관리자"] --> Page["JSP Pages<br/>/WEB-INF/views"]
+    Page --> Static["Static Assets<br/>CSS + JavaScript"]
+    Static --> Api["REST API<br/>/api/**"]
+
+    Browser --> PageController["PageController<br/>JSP 라우팅"]
+    PageController --> Page
+
+    Api --> Controllers["REST Controllers<br/>member/deal/house/favorite/notice/region/admin"]
+    Controllers --> Services["Service Layer<br/>비즈니스 로직"]
+    Services --> Mappers["MyBatis Mappers<br/>Java Interface + XML SQL"]
+    Mappers --> MySQL["MySQL ssafy_home<br/>members, favorites, notices,<br/>dongcodes, houseinfos, housedeals, property_deals"]
+
+    Services --> PublicData["data.go.kr<br/>실거래 API"]
+    Services --> VWorld["VWorld<br/>지역 API"]
+    Services --> SGIS["SGIS<br/>토큰 API"]
+
+    RequestLog["RequestLoggingInterceptor<br/>요청 시작/종료 로그"] --> Logback["Logback<br/>console + ssafyhome.log + ssafyhome-error.log"]
+    LoginCheck["LoginCheckInterceptor<br/>로그인 보호"] --> Controllers
+    ServiceAop["ServiceLoggingAspect<br/>@Before + @AfterReturning"] --> Services
+    ServiceAop --> Logback
+    ExceptionHandler["GlobalExceptionHandler<br/>전역 오류 응답"] --> Logback
+    Controllers --> ExceptionHandler
+
+    OperationLog["OperationLogService<br/>작업 로그"] --> AdminDashboard["Admin Dashboard<br/>운영 로그/DB 조회"]
+    AdminDashboard --> Api
+
+    MySQL --> AdminDashboard
+
+    subgraph Protected["로그인 보호 대상"]
+        ProtectedPages["/favorites<br/>/admin"]
+        ProtectedApis["/api/admin/**<br/>/api/favorites/**<br/>/api/logs/**<br/>/api/deals/fetch*"]
+    end
+
+    LoginCheck --> Protected

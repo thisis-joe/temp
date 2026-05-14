@@ -2,15 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.home.notice.NoticeMapper">
+    <!-- 공지 작성입니다. 로그인하지 않은 작성은 writer_id가 null로 저장될 수 있습니다. -->
     <insert id="insert" parameterType="com.ssafy.home.notice.Notice" useGeneratedKeys="true" keyProperty="id">
         insert into notices (title, content, writer_id)
         values (#{title}, #{content}, #{writerId})
     </insert>
 
+    <!-- 공지 상세 조회입니다. Service에서 조회수 증가 후 다시 조회하는 흐름과 함께 사용됩니다. -->
     <select id="findById" resultType="com.ssafy.home.notice.Notice">
         select * from notices where id = #{id}
     </select>
 
+    <!-- 공지 목록 검색입니다. 제목과 내용에서 키워드를 찾고 최신순으로 표시합니다. -->
     <select id="findAll" resultType="com.ssafy.home.notice.Notice">
         select * from notices
         <where>
@@ -21,16 +24,19 @@
         order by id desc
     </select>
 
+    <!-- 공지 수정입니다. 제목/내용 변경 시 updated_at을 현재 시각으로 갱신합니다. -->
     <update id="update" parameterType="com.ssafy.home.notice.Notice">
         update notices
         set title = #{title}, content = #{content}, updated_at = current_timestamp
         where id = #{id}
     </update>
 
+    <!-- 공지 삭제입니다. OperationLogService가 삭제 작업 로그를 별도로 남깁니다. -->
     <delete id="delete">
         delete from notices where id = #{id}
     </delete>
 
+    <!-- 상세 조회 시 조회수를 1 증가시킵니다. 목록 조회에는 영향을 주지 않습니다. -->
     <update id="increaseViewCount">
         update notices set view_count = view_count + 1 where id = #{id}
     </update>
