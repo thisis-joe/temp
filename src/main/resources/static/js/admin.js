@@ -1,7 +1,7 @@
 const tableLabels = {
     members: "회원",
     property_deals: "수집 실거래",
-    houseinfos: "아파트 단지",
+    houseinfos: "주거 단지",
     housedeals: "단지 거래",
     dongcodes: "법정동 코드",
     favorites: "관심지역",
@@ -60,7 +60,7 @@ function renderMetrics(overview) {
     document.querySelector("#adminMetrics").innerHTML = [
         metric("회원", counts.members, "가입 계정"),
         metric("수집 실거래", counts.property_deals, `최근 거래월 ${overview.latestDealMonth || "-"}`),
-        metric("아파트 단지", counts.houseinfos, `거래 ${formatNumber(counts.housedeals)}건`),
+        metric("주거 단지", counts.houseinfos, `거래 ${formatNumber(counts.housedeals)}건`),
         metric("관심지역", counts.favorites, `공지 ${formatNumber(counts.notices)}건`)
     ].join("");
 }

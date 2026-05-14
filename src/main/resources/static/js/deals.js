@@ -1,4 +1,4 @@
-document.querySelector("#fetchDeals").addEventListener("click", async () => {
+document.querySelector("#fetchDeals")?.addEventListener("click", async () => {
     const params = commonDealParams();
     params.set("type", document.querySelector("#dealType").value);
     params.set("numOfRows", "100");
@@ -10,7 +10,7 @@ document.querySelector("#fetchDeals").addEventListener("click", async () => {
     }
 });
 
-document.querySelector("#fetchAllDeals").addEventListener("click", async () => {
+document.querySelector("#fetchAllDeals")?.addEventListener("click", async () => {
     const params = commonDealParams();
     params.set("numOfRows", "100");
     try {
@@ -22,21 +22,45 @@ document.querySelector("#fetchAllDeals").addEventListener("click", async () => {
     }
 });
 
-document.querySelector("#searchDeals").addEventListener("click", async () => {
-    const params = commonDealParams();
-    params.set("dealType", document.querySelector("#dealType").value);
-    const houseName = document.querySelector("#houseName").value;
-    if (houseName) {
-        params.set("houseName", houseName);
+document.querySelector("#searchDeals")?.addEventListener("click", searchDeals);
+document.querySelector("#dealKeyword")?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        searchDeals();
     }
-    try {
-        renderDeals(await api(`/api/deals?${params}`));
-    } catch (error) {
-        alert(error.message);
+});
+document.querySelector("#loadSummary")?.addEventListener("click", loadSummary);
+
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(location.search);
+    const lawdCd = params.get("lawdCd");
+    if (lawdCd && document.querySelector("#lawdCd")) {
+        document.querySelector("#lawdCd").value = lawdCd;
+        document.querySelector("#dealKeyword").value = lawdCd;
+        searchDeals();
     }
 });
 
-document.querySelector("#loadSummary").addEventListener("click", loadSummary);
+async function searchDeals() {
+    const params = new URLSearchParams();
+    const keyword = document.querySelector("#dealKeyword")?.value?.trim();
+    const lawdCd = document.querySelector("#lawdCd")?.value?.trim();
+    const dealYmd = document.querySelector("#dealYmd")?.value?.trim();
+    if (keyword) {
+        params.set("keyword", keyword);
+    }
+    if (lawdCd && !keyword) {
+        params.set("lawdCd", lawdCd);
+    }
+    if (dealYmd) {
+        params.set("dealYmd", dealYmd);
+    }
+    try {
+        const deals = dedupe(await api(`/api/deals?${params}`), dealKey);
+        renderDeals(deals);
+    } catch (error) {
+        alert(error.message);
+    }
+}
 
 async function loadSummary() {
     const params = commonDealParams();
@@ -54,14 +78,14 @@ function commonDealParams() {
 function renderDeals(deals) {
     const rows = deals.map((deal) => `
         <tr>
-            <td>${label(deal.dealType)}</td>
-            <td>${deal.umdNm ?? ""}</td>
-            <td>${deal.houseName ?? ""}</td>
+            <td>${escapeHtml(label(deal.dealType))}</td>
+            <td>${escapeHtml(deal.umdNm ?? "")}</td>
+            <td>${escapeHtml(deal.houseName ?? "")}</td>
             <td>${deal.dealYear ?? ""}.${deal.dealMonth ?? ""}.${deal.dealDay ?? ""}</td>
             <td>${formatNumber(deal.dealAmount ?? deal.deposit)}</td>
             <td>${formatNumber(deal.monthlyRent)}</td>
             <td>${deal.exclusiveArea ?? deal.landArea ?? ""}</td>
-            <td>${deal.floor ?? ""}</td>
+            <td>${escapeHtml(deal.floor ?? "")}</td>
         </tr>
     `).join("");
     document.querySelector("#dealRows").innerHTML = rows || `<tr><td colspan="8">결과가 없습니다.</td></tr>`;
@@ -70,7 +94,7 @@ function renderDeals(deals) {
 function renderSummary(summaries) {
     const rows = summaries.map((item) => `
         <tr>
-            <td>${label(item.dealType)}</td>
+            <td>${escapeHtml(label(item.dealType))}</td>
             <td>${formatNumber(item.dealCount)}</td>
             <td>${formatNumber(item.minDealAmount)}</td>
             <td>${formatNumber(item.avgDealAmount)}</td>
@@ -84,6 +108,14 @@ function renderSummary(summaries) {
     document.querySelector("#summaryRows").innerHTML = rows || `<tr><td colspan="9">요약할 거래가 없습니다.</td></tr>`;
 }
 
+function dealKey(deal) {
+    return [
+        deal.dealType, deal.lawdCd, deal.umdNm, deal.houseName, deal.jibun,
+        deal.dealYear, deal.dealMonth, deal.dealDay, deal.dealAmount,
+        deal.deposit, deal.monthlyRent, deal.exclusiveArea, deal.landArea, deal.floor
+    ].join("|");
+}
+
 function label(type) {
     return {
         APT_TRADE: "아파트 매매",
@@ -95,4 +127,8 @@ function label(type) {
 
 function formatNumber(value) {
     return value == null ? "" : Number(value).toLocaleString("ko-KR");
+}
+
+function dedupe(items, keySelector) {
+    return Array.from(new Map(items.map((item) => [keySelector(item), item])).values());
 }

@@ -19,7 +19,7 @@ public class AdminController {
     private static final Map<String, TableConfig> TABLES = Map.of(
             "members", new TableConfig("members", "회원", List.of("id", "email", "name", "phone", "role", "created_at"), List.of("email", "name", "phone"), "id desc"),
             "property_deals", new TableConfig("property_deals", "수집 실거래", List.of("id", "deal_type", "lawd_cd", "umd_nm", "house_name", "deal_year", "deal_month", "deal_amount", "deposit", "monthly_rent", "created_at"), List.of("deal_type", "lawd_cd", "umd_nm", "house_name"), "id desc"),
-            "houseinfos", new TableConfig("houseinfos", "아파트 단지", List.of("apt_seq", "sgg_cd", "umd_cd", "umd_nm", "jibun", "road_nm", "apt_nm", "build_year"), List.of("apt_seq", "umd_nm", "road_nm", "apt_nm"), "apt_seq"),
+            "houseinfos", new TableConfig("houseinfos", "주거 단지", List.of("apt_seq", "sgg_cd", "umd_cd", "umd_nm", "jibun", "road_nm", "apt_nm", "build_year"), List.of("apt_seq", "sgg_cd", "umd_cd", "umd_nm", "road_nm", "apt_nm"), "apt_seq"),
             "housedeals", new TableConfig("housedeals", "단지 거래", List.of("no", "apt_seq", "apt_dong", "floor", "deal_year", "deal_month", "deal_day", "exclu_use_ar", "deal_amount"), List.of("apt_seq", "apt_dong", "deal_amount"), "no desc"),
             "dongcodes", new TableConfig("dongcodes", "법정동 코드", List.of("dong_code", "sido_name", "gugun_name", "dong_name"), List.of("dong_code", "sido_name", "gugun_name", "dong_name"), "dong_code"),
             "favorites", new TableConfig("favorites", "관심지역", List.of("id", "member_id", "sido_nm", "sigungu_nm", "dong_nm", "lawd_cd", "memo", "created_at"), List.of("sido_nm", "sigungu_nm", "dong_nm", "lawd_cd", "memo"), "id desc"),

@@ -18,6 +18,7 @@
 | `08_ARCHITECTURE_CURRENT_STATE.md` | 현재 아키텍처 문서. 계층, 요청 흐름, 데이터 흐름, Mermaid 포함 |
 | `09_LOGGING_ERROR_SECURITY_GUIDE.md` | 로그/에러/보안 문서. Interceptor, AOP, GlobalExceptionHandler, 세션 정책 |
 | `10_RELEASE_AND_VERIFICATION_CHECKLIST.md` | 릴리즈/검증 체크리스트. 빌드, smoke test, UI/API/로그 확인 |
+| `11_UI_SEARCH_AUTH_MAP_UPDATE.md` | 로그인/검색/지도/공지/관심지역 UI 수정 내역 |
 
 ## 현재 상태 요약
 

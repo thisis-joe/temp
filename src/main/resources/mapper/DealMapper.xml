@@ -24,19 +24,51 @@
           and deal_month = cast(substring(#{dealYmd}, 5, 2) as unsigned)
     </delete>
 
-    <!-- 실거래 화면의 DB 검색입니다. 조건이 비어 있으면 생략하고, 화면 과부하를 막기 위해 200건으로 제한합니다. -->
+    <!-- 실거래 화면의 DB 검색입니다. 통합 검색어는 지역/단지/유형/코드를 넓게 찾고, row_number로 같은 거래를 한 번만 보여줍니다. -->
     <select id="search" resultType="com.ssafy.home.deal.PropertyDeal">
-        select * from property_deals
-        <where>
-            <if test="dealType != null">deal_type = #{dealType}</if>
-            <if test="lawdCd != null">and lawd_cd = #{lawdCd}</if>
-            <if test="dong != null">and umd_nm like concat('%', #{dong}, '%')</if>
-            <if test="houseName != null">and house_name like concat('%', #{houseName}, '%')</if>
-            <if test="dealYmd != null and dealYmd.length() == 6">
-                and deal_year = cast(substring(#{dealYmd}, 1, 4) as unsigned)
-                and deal_month = cast(substring(#{dealYmd}, 5, 2) as unsigned)
-            </if>
-        </where>
+        select id, deal_type, lawd_cd, umd_nm, house_name, house_type, jibun, road_name, build_year,
+               exclusive_area, land_area, deal_year, deal_month, deal_day, deal_amount, deposit,
+               monthly_rent, floor, deal_gbn, raw_xml, created_at
+        from (
+            select pd.*,
+                   row_number() over (
+                       partition by deal_type, lawd_cd, ifnull(umd_nm, ''), ifnull(house_name, ''),
+                                    ifnull(jibun, ''), ifnull(road_name, ''), ifnull(deal_year, 0),
+                                    ifnull(deal_month, 0), ifnull(deal_day, 0), ifnull(deal_amount, -1),
+                                    ifnull(deposit, -1), ifnull(monthly_rent, -1),
+                                    ifnull(exclusive_area, -1), ifnull(land_area, -1), ifnull(floor, '')
+                       order by id desc
+                   ) as rn
+            from property_deals pd
+            <where>
+                <if test="dealType != null">deal_type = #{dealType}</if>
+                <if test="lawdCd != null">and lawd_cd = #{lawdCd}</if>
+                <if test="dong != null">and umd_nm like concat('%', #{dong}, '%')</if>
+                <if test="houseName != null">and house_name like concat('%', #{houseName}, '%')</if>
+                <if test="dealYmd != null and dealYmd.length() == 6">
+                    and deal_year = cast(substring(#{dealYmd}, 1, 4) as unsigned)
+                    and deal_month = cast(substring(#{dealYmd}, 5, 2) as unsigned)
+                </if>
+                <if test="keyword != null and keyword != ''">
+                    and (
+                        lawd_cd like concat(#{keyword}, '%')
+                        or umd_nm like concat('%', #{keyword}, '%')
+                        or house_name like concat('%', #{keyword}, '%')
+                        or house_type like concat('%', #{keyword}, '%')
+                        or jibun like concat('%', #{keyword}, '%')
+                        or road_name like concat('%', #{keyword}, '%')
+                        or deal_type like concat('%', #{keyword}, '%')
+                        or case deal_type
+                            when 'APT_TRADE' then '아파트 매매'
+                            when 'APT_RENT' then '아파트 전월세'
+                            when 'RH_TRADE' then '연립다세대 매매'
+                            when 'RH_RENT' then '연립다세대 전월세'
+                        end like concat('%', #{keyword}, '%')
+                    )
+                </if>
+            </where>
+        ) deduped
+        where rn = 1
         order by deal_year desc, deal_month desc, deal_day desc, id desc
         limit 200
     </select>

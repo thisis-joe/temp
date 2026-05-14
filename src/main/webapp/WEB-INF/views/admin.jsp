@@ -36,7 +36,7 @@
     <section class="metric-grid" id="adminMetrics">
         <div class="metric-card"><span>회원</span><strong>-</strong></div>
         <div class="metric-card"><span>수집 실거래</span><strong>-</strong></div>
-        <div class="metric-card"><span>아파트 단지</span><strong>-</strong></div>
+        <div class="metric-card"><span>주거 단지</span><strong>-</strong></div>
         <div class="metric-card"><span>최근 거래월</span><strong>-</strong></div>
     </section>
 

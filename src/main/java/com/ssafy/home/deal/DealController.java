@@ -57,8 +57,9 @@ public class DealController {
             @RequestParam(required = false) String lawdCd,
             @RequestParam(required = false) String dong,
             @RequestParam(required = false) String houseName,
-            @RequestParam(required = false) String dealYmd
+            @RequestParam(required = false) String dealYmd,
+            @RequestParam(required = false) String keyword
     ) {
-        return ApiResponse.ok(dealService.search(dealType, lawdCd, dong, houseName, dealYmd));
+        return ApiResponse.ok(dealService.search(dealType, lawdCd, dong, houseName, dealYmd, keyword));
     }
 }

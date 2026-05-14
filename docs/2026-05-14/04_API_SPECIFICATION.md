@@ -166,6 +166,9 @@ Query:
 | dong | N | 동명 |
 | houseName | N | 단지/주택명 |
 | dealYmd | N | 계약년월 |
+| keyword | N | 지역/동/단지명/주택명/거래유형/법정동 코드 통합 검색어 |
+
+중복 저장된 같은 거래는 DB 조회 단계에서 `row_number()` 기준으로 한 번만 반환한다.
 
 ## 6. House API
 

@@ -16,7 +16,8 @@ public interface DealMapper {
             @Param("lawdCd") String lawdCd,
             @Param("dong") String dong,
             @Param("houseName") String houseName,
-            @Param("dealYmd") String dealYmd
+            @Param("dealYmd") String dealYmd,
+            @Param("keyword") String keyword
     );
 
     int countByTypeAndMonth(@Param("dealType") String dealType, @Param("lawdCd") String lawdCd, @Param("dealYmd") String dealYmd);

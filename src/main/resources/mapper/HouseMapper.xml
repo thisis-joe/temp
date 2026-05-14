@@ -21,7 +21,7 @@
         limit 100
     </select>
 
-    <!-- 단지 검색 목록입니다. dongcodes로 지역명을 붙이고 housedeals 집계로 최근 거래와 거래 수를 함께 보여줍니다. -->
+    <!-- 단지 검색 목록입니다. 한 검색어로 코드/지역/단지/도로명을 모두 찾고 apt_seq 기준으로 묶어 중복 단지를 제거합니다. -->
     <select id="searchHouses" resultType="com.ssafy.home.house.HouseInfoDto">
         select
             h.apt_seq,
@@ -61,6 +61,7 @@
                     h.apt_nm like concat('%', #{keyword}, '%')
                     or h.umd_nm like concat('%', #{keyword}, '%')
                     or h.road_nm like concat('%', #{keyword}, '%')
+                    or concat(h.sgg_cd, h.umd_cd) like concat(#{keyword}, '%')
                     or d.sido_name like concat('%', #{keyword}, '%')
                     or d.gugun_name like concat('%', #{keyword}, '%')
                     or d.dong_name like concat('%', #{keyword}, '%')

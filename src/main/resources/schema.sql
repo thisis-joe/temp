@@ -35,7 +35,8 @@ create table if not exists property_deals (
     raw_xml text,
     created_at timestamp not null default current_timestamp,
     index idx_property_deals_region_month (lawd_cd, deal_year, deal_month),
-    index idx_property_deals_type_month (deal_type, lawd_cd, deal_year, deal_month)
+    index idx_property_deals_type_month (deal_type, lawd_cd, deal_year, deal_month),
+    index idx_property_deals_keyword (lawd_cd, umd_nm, house_name, deal_type)
 );
 
 -- 법정동 코드 기준 테이블입니다. 지역 선택, 단지 검색 지역명 표시, 관심지역 코드 입력에 사용합니다.
@@ -46,7 +47,7 @@ create table if not exists dongcodes (
     dong_name varchar(30)
 );
 
--- 아파트 단지 기본정보입니다. housedeals와 apt_seq로 연결됩니다.
+-- 아파트 단지 기본정보입니다. 주거 단지 검색 화면에서 표시하며 housedeals와 apt_seq로 연결됩니다.
 create table if not exists houseinfos (
     apt_seq varchar(20) not null primary key,
     sgg_cd varchar(5),

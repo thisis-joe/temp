@@ -131,7 +131,7 @@ flowchart LR
 | `views/home.jsp` | 실제 서비스 첫 화면, 주요 기능 진입 | 브랜드 인상, 메인 CTA, footer 관리자 링크 노출 방식에 영향 |
 | `views/deals.jsp` | 실거래 수집/검색/요약 화면 | `deals.js`, `/api/deals/*`와 직접 연결 |
 | `views/houses.jsp` | 단지/지역 검색과 상세 이력 화면 | `houses.js`, `/api/houses/*`와 직접 연결 |
-| `views/members.jsp` | 회원가입/로그인/회원조회 화면 | 세션 생성, 관리자 진입 전 로그인 흐름에 영향 |
+| `views/members.jsp` | 계정 안내와 내 정보 확인 화면 | 실제 로그인/회원가입은 공통 모달에서 처리, 회원목록은 관리자 DB 조회로 분리 |
 | `views/favorites.jsp` | 로그인 사용자 관심지역 화면 | LoginCheckInterceptor 보호 대상, `favorites.js`와 연결 |
 | `views/notices.jsp` | 공지사항 CRUD 화면 | `notices.js`, `/api/notices/*`와 연결 |
 | `views/regions.jsp` | DB/VWorld/SGIS 지역정보 확인 화면 | 외부 API 키 검증과 지역 API 오류 확인에 영향 |
@@ -145,8 +145,8 @@ flowchart LR
 | `static/js/deals.js` | 실거래 검색/수집/요약 버튼 이벤트와 테이블 렌더링 | `/api/deals/*` 응답 구조 변경 시 함께 수정 필요 |
 | `static/js/houses.js` | 지역 검색, 단지 검색, 단지 상세/거래 이력 렌더링 | `/api/houses/*` 응답 구조 변경 시 함께 수정 필요 |
 | `static/js/members.js` | 회원가입/로그인/내정보/로그아웃/회원목록 동작 | `/api/auth/*`, `/api/members/*` 응답 구조와 연결 |
-| `static/js/favorites.js` | 관심지역 등록/조회/삭제 동작 | 로그인 보호와 `/api/favorites/*` 응답 구조에 영향 |
-| `static/js/notices.js` | 공지 검색/상세/작성/수정/삭제 동작 | `/api/notices/*` 응답 구조에 영향 |
+| `static/js/favorites.js` | 관심지역 등록/목록/삭제/거래 보기 동작 | 로그인 보호와 `/api/favorites/*` 응답 구조에 영향 |
+| `static/js/notices.js` | 공지 목록/상세 선택/작성/수정/삭제 동작 | `/api/notices/*` 응답 구조에 영향 |
 | `static/js/regions.js` | DB 지역 코드, VWorld, SGIS API 응답 표시 | 외부 API 오류 메시지와 브라우저 표시 방식에 영향 |
 | `static/js/admin.js` | 관리자 요약 지표, 작업 로그, DB 테이블 필터 조회 렌더링 | `/api/admin/*`, `/api/logs` 응답 구조와 직접 연결 |
 

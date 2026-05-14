@@ -70,10 +70,17 @@ public class DealService {
         return results;
     }
 
-    public List<PropertyDeal> search(String dealType, String lawdCd, String dong, String houseName, String dealYmd) {
-        List<PropertyDeal> deals = dealMapper.search(blankToNull(dealType), blankToNull(lawdCd), blankToNull(dong), blankToNull(houseName), blankToNull(dealYmd));
-        log.info("실거래 DB 검색 완료. dealType={}, lawdCd={}, dong={}, houseName={}, dealYmd={}, resultCount={}",
-                dealType, lawdCd, dong, houseName, dealYmd, deals.size());
+    public List<PropertyDeal> search(String dealType, String lawdCd, String dong, String houseName, String dealYmd, String keyword) {
+        List<PropertyDeal> deals = dealMapper.search(
+                blankToNull(dealType),
+                blankToNull(lawdCd),
+                blankToNull(dong),
+                blankToNull(houseName),
+                blankToNull(dealYmd),
+                blankToNull(keyword)
+        );
+        log.info("실거래 DB 검색 완료. dealType={}, lawdCd={}, dong={}, houseName={}, dealYmd={}, keyword={}, resultCount={}",
+                dealType, lawdCd, dong, houseName, dealYmd, keyword, deals.size());
         return deals;
     }
 
