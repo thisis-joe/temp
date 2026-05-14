@@ -12,12 +12,10 @@
     <a class="brand" href="/">SSAFY Home</a>
     <nav class="nav">
         <a href="/deals">실거래가</a>
-        <a href="/houses">아파트 단지</a>
-        <a href="/members">로그인/회원</a>
+        <a href="/houses">주거 단지</a>
         <a href="/favorites">관심지역</a>
         <a href="/notices">공지사항</a>
         <a href="/regions">지역정보</a>
-        <a href="/admin">관리자</a>
     </nav>
     <div class="header-tools">
         <span id="sessionStatus">로그인 확인 중</span>
@@ -58,7 +56,7 @@
             <p>단지명을 알고 있다면 단지 검색부터, 지역과 월을 알고 있다면 실거래 조회부터 시작하세요.</p>
         </div>
         <div class="quick-actions">
-            <a href="/houses">아파트 단지 찾기</a>
+            <a href="/houses">아파트·연립다세대 찾기</a>
             <a href="/deals">월별 실거래 분석</a>
             <a href="/favorites">관심지역 보기</a>
         </div>
@@ -66,8 +64,8 @@
 
     <section class="service-grid">
         <a class="feature-link" href="/houses">
-            <strong>단지 중심 검색</strong>
-            <span>DB에 저장된 아파트 단지와 최근 거래 이력을 함께 확인합니다.</span>
+            <strong>주거 단지 검색</strong>
+            <span>DB에 저장된 아파트 단지와 연립다세대 실거래 흐름을 함께 확인합니다.</span>
         </a>
         <a class="feature-link" href="/deals">
             <strong>실거래 수집 및 분석</strong>

@@ -4,36 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>로그인/회원 | SSAFY Home</title>
+    <title>계정 | SSAFY Home</title>
     <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
 <header class="topbar">
     <a class="brand" href="/">SSAFY Home</a>
     <nav class="nav">
-        <a href="/deals">실거래가</a><a href="/houses">아파트 단지</a><a class="active" href="/members">로그인/회원</a><a href="/favorites">관심지역</a><a href="/notices">공지사항</a><a href="/regions">지역정보</a><a href="/admin">관리자</a>
+        <a href="/deals">실거래가</a><a href="/houses">주거 단지</a><a href="/favorites">관심지역</a><a href="/notices">공지사항</a><a href="/regions">지역정보</a>
     </nav>
     <div class="header-tools"><span id="sessionStatus">로그인 확인 중</span><button id="themeToggle" class="ghost small">다크 모드</button></div>
 </header>
 <main class="page">
-    <section class="page-head"><h1>로그인과 회원 관리</h1><p>세션 기반 로그인 상태를 확인하고 회원 정보를 조회합니다.</p></section>
-    <section class="split">
-        <div class="panel">
-            <h2>가입 및 로그인</h2>
-            <label>이메일 <input id="email" value="test@ssafy.com"></label>
-            <label>비밀번호 <input id="password" type="password" value="1234"></label>
-            <label>이름 <input id="name" value="김싸피"></label>
-            <label>전화번호 <input id="phone" value="010-0000-0000"></label>
-            <label>주소 <input id="address" value="서울"></label>
-            <div class="actions"><button id="register">가입</button><button id="login" class="secondary">로그인</button><button id="me" class="ghost">내 정보</button><button id="logout" class="ghost">로그아웃</button></div>
-            <pre id="memberResult"></pre>
+    <section class="page-head">
+        <h1>계정</h1>
+        <p>로그인과 회원가입은 우측 상단 버튼에서 분리해 처리합니다. 회원 목록 조회는 관리자 대시보드에서만 확인합니다.</p>
+    </section>
+    <section class="panel account-panel">
+        <h2>내 계정</h2>
+        <div class="actions">
+            <button id="accountLogin">로그인</button>
+            <button id="accountRegister" class="secondary">회원가입</button>
+            <button id="me" class="ghost">내 정보 확인</button>
+            <button id="logout" class="ghost">로그아웃</button>
         </div>
-        <div class="panel">
-            <h2>회원 조회</h2>
-            <label>검색어 <input id="memberKeyword" placeholder="이름 또는 이메일"></label>
-            <div class="actions"><button id="listMembers">회원 목록</button></div>
-            <pre id="memberListResult"></pre>
-        </div>
+        <pre id="memberResult">로그인이 필요한 기능에서 이 화면으로 이동하면 로그인 창이 자동으로 열립니다.</pre>
     </section>
 </main>
 <script src="/js/common.js"></script>

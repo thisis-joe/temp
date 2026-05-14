@@ -12,12 +12,10 @@
     <a class="brand" href="/">SSAFY Home</a>
     <nav class="nav">
         <a class="active" href="/deals">실거래가</a>
-        <a href="/houses">아파트 단지</a>
-        <a href="/members">로그인/회원</a>
+        <a href="/houses">주거 단지</a>
         <a href="/favorites">관심지역</a>
         <a href="/notices">공지사항</a>
         <a href="/regions">지역정보</a>
-        <a href="/admin">관리자</a>
     </nav>
     <div class="header-tools"><span id="sessionStatus">로그인 확인 중</span><button id="themeToggle" class="ghost small">다크 모드</button></div>
 </header>
@@ -30,7 +28,7 @@
 
     <section class="panel search-panel">
         <div class="form-grid">
-            <label>거래 유형
+            <label>수집 거래 유형
                 <select id="dealType">
                     <option value="APT_TRADE">아파트 매매</option>
                     <option value="APT_RENT">아파트 전월세</option>
@@ -38,9 +36,9 @@
                     <option value="RH_RENT">연립다세대 전월세</option>
                 </select>
             </label>
+            <label class="wide">통합 검색 <input id="dealKeyword" placeholder="지역, 동, 단지명, 주택명, 거래유형, 법정동 코드"></label>
             <label>법정동 코드 <input id="lawdCd" value="11110" maxlength="5"></label>
             <label>계약 년월 <input id="dealYmd" value="202407" maxlength="6"></label>
-            <label>단지명 <input id="houseName" placeholder="예: 현대"></label>
         </div>
         <div class="actions">
             <button id="searchDeals">DB 검색</button>

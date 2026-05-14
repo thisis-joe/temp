@@ -11,7 +11,7 @@
 <header class="topbar">
     <a class="brand" href="/">SSAFY Home</a>
     <nav class="nav">
-        <a href="/deals">실거래가</a><a href="/houses">아파트 단지</a><a href="/members">로그인/회원</a><a href="/favorites">관심지역</a><a href="/notices">공지사항</a><a class="active" href="/regions">지역정보</a><a href="/admin">관리자</a>
+        <a href="/deals">실거래가</a><a href="/houses">주거 단지</a><a href="/favorites">관심지역</a><a href="/notices">공지사항</a><a class="active" href="/regions">지역정보</a>
     </nav>
     <div class="header-tools"><span id="sessionStatus">로그인 확인 중</span><button id="themeToggle" class="ghost small">다크 모드</button></div>
 </header>

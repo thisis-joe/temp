@@ -11,7 +11,7 @@
 <header class="topbar">
     <a class="brand" href="/">SSAFY Home</a>
     <nav class="nav">
-        <a href="/deals">실거래가</a><a href="/houses">아파트 단지</a><a href="/members">로그인/회원</a><a class="active" href="/favorites">관심지역</a><a href="/notices">공지사항</a><a href="/regions">지역정보</a><a href="/admin">관리자</a>
+        <a href="/deals">실거래가</a><a href="/houses">주거 단지</a><a class="active" href="/favorites">관심지역</a><a href="/notices">공지사항</a><a href="/regions">지역정보</a>
     </nav>
     <div class="header-tools"><span id="sessionStatus">로그인 확인 중</span><button id="themeToggle" class="ghost small">다크 모드</button></div>
 </header>
@@ -25,8 +25,14 @@
             <label>법정동 코드 <input id="favLawdCd" value="11110"></label>
             <label class="wide">메모 <input id="memo" value="출퇴근 관심 지역"></label>
         </div>
-        <div class="actions"><button id="addFavorite">등록</button><button id="listFavorite" class="secondary">목록</button></div>
-        <pre id="favoriteResult"></pre>
+        <div class="actions"><button id="addFavorite">등록</button><button id="listFavorite" class="secondary">목록 새로고침</button></div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>지역</th><th>법정동 코드</th><th>메모</th><th>관리</th></tr></thead>
+                <tbody id="favoriteRows"><tr><td colspan="4">관심지역 목록을 불러오세요.</td></tr></tbody>
+            </table>
+        </div>
+        <pre id="favoriteResult">등록 결과와 오류가 표시됩니다.</pre>
     </section>
 </main>
 <script src="/js/common.js"></script>
